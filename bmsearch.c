@@ -36,6 +36,11 @@ void bm_prep(struct bmsearch *bm) {
 		}
 	}
 	bm->shift1 = shift1;
+
+	printf("bm shift1 :%d\n", shift1);
+	for(i=pat_len-1 ; i >= 0 ; i--) {
+		printf("%c %d\n", pattern[i], shift[pattern[i]]);
+	}
 }
 
 void inverse_bm_prep(struct bmsearch *bm) {
@@ -71,7 +76,7 @@ char* bm_search(struct bmsearch* bm, unsigned char *strbeg, unsigned char *stren
 	if(pat_len > strLength ) {
 		return NULL;
 	}
-	
+	printf("## bm search\n");
 	while(ptr < (strbeg + strLength - pat_len + 1) ) {
 		/*
 		if(INSENSITIVE) {
@@ -79,18 +84,27 @@ char* bm_search(struct bmsearch* bm, unsigned char *strbeg, unsigned char *stren
 				*ptr = *ptr - 'A' + 'a';
 			}
 		}*/
+		//printf("## bm search start\n");
+		//printf("ptr: %c\n", *ptr);
+		//printf("c= %d\n", bm->shift[(unsigned char)*ptr]);
 		while( c = bm->shift[(unsigned char)*ptr] ) {
 			ptr += c;
+			//printf("ptr += %d\n", c);
 			if(ptr > ( strbeg + strLength - pat_len)) {
 				break;
 			}
 		}
-		if(trymatch(ptr-pat_len + 1, strend, bm->pattern)) {
+		//printf("str len %d\n", strend-strbeg);
+		if(ptr-pat_len+1 < strbeg) {
+			printf("overflow\n");
+			ptr += bm->shift1;
+		}
+		else if(trymatch(ptr-pat_len + 1, strend, bm->pattern)) {
+			printf("matching\n");
 			return ptr - pat_len + 1;
 		}
 		else {
 			ptr += bm->shift1;
-//			printf("shift1\n");
 		}
 	}
 
@@ -102,8 +116,6 @@ int trymatch(unsigned char *strbeg, unsigned char *strend, unsigned char *patter
 	int patternLength = strlen(pattern);
 	int strLength = strend - strbeg + 1;
 	if( strLength< patternLength) return 0;
-	//printf("trymatch : %s\n", str);
-	
 	for(i=0; i<patternLength; i++) {	
 		/*
 		if(INSENSITIVE) {
@@ -125,7 +137,7 @@ char* inverse_bm_search(struct bmsearch* bm, unsigned char *strbeg, unsigned cha
 	int strLength = strend - strbeg + 1;
 
 	char *ptr = strend;
-
+	printf("## inverse bm search\n");
 	if( pat_len > strLength ) {
 		return NULL;
 	}
@@ -141,7 +153,12 @@ char* inverse_bm_search(struct bmsearch* bm, unsigned char *strbeg, unsigned cha
 			ptr -= c;
 			if(ptr < ( strend - strLength + pat_len))	break;
 		}
-		if(trymatch(ptr-pat_len + 1, strend,bm->pattern)) {
+		
+		if(ptr-pat_len+1 < strbeg) {
+			printf("inverse overflow\n");
+			return -1;
+		}
+		else if(trymatch(ptr-pat_len + 1, strend,bm->pattern)) {
 			return ptr - pat_len + 1;
 		}
 		else {

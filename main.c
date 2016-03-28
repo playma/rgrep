@@ -13,10 +13,10 @@ int main() {
 	while(i<2) {
 		filename[0] = '\0';
 		sprintf(number, "%d", i++);
-		strcat(filename, "../youtubeData/youtube_");
+		strcat(filename, "./youtubeData/youtube_");
 		strcat(filename, number);
 		strcat(filename, ".gais");
 		printf("%s\n", filename);
-		myread(filename, "Subaru");
+		myread(filename, "chopin");
 	}
 }

@@ -3,7 +3,7 @@
 #define _MYFILESYSTEM_H
 
 
-#define BLOCKSIZE 35*getpagesize()
+#define BLOCKSIZE 1*getpagesize()
 
 int myread(char*, unsigned char*);
 void check_mmap(char *);
