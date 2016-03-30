@@ -17,6 +17,6 @@ int main() {
 		strcat(filename, number);
 		strcat(filename, ".gais");
 		printf("%s\n", filename);
-		myread(filename, "chopin");
+		myread(filename, "Subaru");
 	}
 }

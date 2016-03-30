@@ -58,13 +58,12 @@ int myread(char *filename, unsigned char* pattern) {
 		addr = mmap(NULL, BLOCKSIZE, PROT_READ, MAP_PRIVATE, fd, offset);
 		check_mmap(addr);
 		offset_recend = offset;
-	
+		//printf("offset :%d\n", offset);
 		limit = addr - offset + fileSize -1;
-		printf("offset %d\n", offset);
+
 		while((match = bm_search(&bm, addr + offset_recend - offset, min((addr+length-1), limit))) != -1) {
 		//while((match = bm_search(&bm, addr + offset_recend - offset, addr+length-1)) != -1) {
 			//match pattern	
-			//printf("matching\n");
 			offset_match = match - addr + offset;
 		
 //			printf("## match pattern at %d\n", offset_match);	
@@ -76,7 +75,6 @@ int myread(char *filename, unsigned char* pattern) {
 				length += BLOCKSIZE;
 				offset -= BLOCKSIZE;
 				munmap(addr, length);
-
 				addr = mmap(NULL, length, PROT_READ, MAP_PRIVATE, fd, offset);
 				check_mmap(addr);
 			}
@@ -88,9 +86,10 @@ int myread(char *filename, unsigned char* pattern) {
 			//while( (rec_end = bm_search(&search_rec_end, addr+offset_match-offset , addr+length)) == -1 ) {
 				//printf("can not find rec_end. mmap new\n");
 				length += BLOCKSIZE;	
-				munmap(addr, length);
+				munmap(addr, BLOCKSIZE);
 				addr = mmap(NULL, length, PROT_READ, MAP_PRIVATE, fd, offset);
 				check_mmap(addr);
+				//exit(1);
 			}
 			offset_recend = rec_end - addr + offset;
 			//printf("## find recend at %d\n", offset_recend);
@@ -119,7 +118,7 @@ int myread(char *filename, unsigned char* pattern) {
 	}	
 	printf("## count: %d\n", match_count);
 	//printf("\n");
-	close(fd);
+
 	return 1;
 }
 
@@ -128,3 +127,4 @@ void check_mmap(char *addr) {
 		handle_error("mmap");
 	}
 }
+
